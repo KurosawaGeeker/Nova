@@ -38,3 +38,13 @@ cd /Users/xiaoke/Nova/android
 ./gradlew installDebug
 adb shell am start -n com.xiaoke.nova/com.xiaoke.nova.ui.MainActivity
 ```
+
+## GitHub auto deploy
+
+Pushing to `main` deploys the backend to the Lightsail server through GitHub Actions.
+
+- Workflow: `.github/workflows/deploy-backend.yml`
+- Target host: `52.77.85.56`
+- Remote backend path: `/home/ubuntu/nova/backend`
+
+The workflow syncs the repository, preserves the server-side `backend/.env`, runs `npm ci`, rebuilds the backend, and restarts `nova-backend`.

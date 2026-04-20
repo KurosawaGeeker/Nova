@@ -1,0 +1,55 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY_HOST: 52.77.85.56
+      DEPLOY_USER: ubuntu
+      DEPLOY_ROOT: /home/ubuntu/nova
+      BACKEND_DIR: /home/ubuntu/nova/backend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure SSH
+        shell: bash
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.NOVA_DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+
+      - name: Sync repository to server
+        shell: bash
+        run: |
+          rsync -az --delete \
+            --exclude '.git/' \
+            --exclude '.github/' \
+            --exclude 'android/.gradle/' \
+            --exclude 'android/.idea/' \
+            --exclude 'android/local.properties' \
+            --exclude 'backend/node_modules/' \
+            --exclude 'backend/dist/' \
+            --exclude 'backend/data/' \
+            --filter='P backend/.env' \
+            ./ "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_ROOT}/"
+
+      - name: Build and restart backend
+        shell: bash
+        run: |
+          ssh "${DEPLOY_USER}@${DEPLOY_HOST}" <<'EOF'
+          set -euo pipefail
+          cd /home/ubuntu/nova/backend
+          npm ci
+          npm run build
+          sudo systemctl restart nova-backend
+          sudo systemctl status --no-pager nova-backend
+          curl -fsS http://127.0.0.1:8787/health
+          EOF
