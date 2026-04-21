@@ -17,7 +17,10 @@ npm run dev
 
 The backend defaults to `mock` TTS mode when `OPENAI_API_KEY` is not set, so the full job flow can be exercised locally without external credentials.
 
-When `OPENAI_API_KEY` is present, the backend also enables an article-cleaning preprocessing step before chaptering. This uses `OPENAI_PREPROCESS_MODEL` (default `gpt-4o-mini`) to drop navigation, share prompts, table-of-contents blocks, and other webpage UI chrome that should not be read aloud.
+When `OPENAI_API_KEY` is present, the backend also enables two LLM layers before speech synthesis:
+
+- article-cleaning preprocessing with `OPENAI_PREPROCESS_MODEL` (default `gpt-4o-mini`) to drop navigation, share prompts, table-of-contents blocks, and other webpage UI chrome that should not be read aloud
+- listening-friendly chapter adaptation with `OPENAI_ADAPT_MODEL` (default `gpt-4o-mini`) to rewrite dense reading-oriented prose into a clearer spoken script before TTS
 
 Batch imports are supported in the Android UI by pasting a block of text or a clipboard dump that contains multiple URLs. The backend runs import jobs with bounded parallelism; tune this with `IMPORT_CONCURRENCY` if you want more or fewer simultaneous conversions.
 

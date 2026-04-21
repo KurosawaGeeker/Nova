@@ -19,9 +19,11 @@ const baseConfig: AppConfig = {
   importConcurrency: 3,
   openAiModel: "gpt-4o-mini-tts",
   openAiPreprocessModel: "gpt-4o-mini",
+  openAiAdaptModel: "gpt-4o-mini",
   openAiVoice: "alloy",
   ttsMode: "mock",
   contentPreprocessMode: "heuristic",
+  audioAdaptMode: "off",
   userAgent: "test-agent",
 };
 

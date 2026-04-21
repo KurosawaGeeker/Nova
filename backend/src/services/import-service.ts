@@ -17,6 +17,7 @@ import { FileBackedStore } from "../storage/store.js";
 import { WebpageExtractor } from "./webpage-extractor.js";
 import type { TtsClient } from "../tts/tts-client.js";
 import { ContentPreprocessor } from "./content-preprocessor.js";
+import { AudioScriptAdapter } from "./audio-script-adapter.js";
 
 export class ImportService {
   private readonly pendingJobIds: string[] = [];
@@ -27,6 +28,7 @@ export class ImportService {
     private readonly store: FileBackedStore,
     private readonly extractor: WebpageExtractor,
     private readonly contentPreprocessor: ContentPreprocessor,
+    private readonly audioScriptAdapter: AudioScriptAdapter,
     private readonly ttsClient: TtsClient,
   ) {}
 
@@ -97,7 +99,10 @@ export class ImportService {
 
       await this.store.updateJob(jobId, { status: "EXTRACTING", progress: 18 });
       const article = await this.contentPreprocessor.preprocess(extractedArticle);
-      const chapters = buildChapters(article.title, article.contentHtml, article.textContent);
+      const chapters = await this.audioScriptAdapter.adaptChapters(
+        article,
+        buildChapters(article.title, article.contentHtml, article.textContent),
+      );
 
       if (chapters.length === 0) {
         throw new Error("No readable chapters were extracted from the page");

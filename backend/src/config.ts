@@ -12,9 +12,11 @@ const schema = z.object({
   OPENAI_API_KEY: z.string().optional(),
   OPENAI_MODEL: z.string().default("gpt-4o-mini-tts"),
   OPENAI_PREPROCESS_MODEL: z.string().default("gpt-4o-mini"),
+  OPENAI_ADAPT_MODEL: z.string().default("gpt-4o-mini"),
   OPENAI_VOICE: z.string().default("alloy"),
   TTS_MODE: z.enum(["auto", "openai", "mock"]).default("auto"),
   CONTENT_PREPROCESS_MODE: z.enum(["auto", "openai", "heuristic"]).default("auto"),
+  AUDIO_ADAPT_MODE: z.enum(["auto", "openai", "off"]).default("auto"),
 });
 
 export interface AppConfig {
@@ -28,9 +30,11 @@ export interface AppConfig {
   openAiApiKey?: string;
   openAiModel: string;
   openAiPreprocessModel: string;
+  openAiAdaptModel: string;
   openAiVoice: string;
   ttsMode: "openai" | "mock";
   contentPreprocessMode: "openai" | "heuristic";
+  audioAdaptMode: "openai" | "off";
   userAgent: string;
 }
 
@@ -49,6 +53,12 @@ export function loadConfig(): AppConfig {
         ? "openai"
         : "heuristic"
       : env.CONTENT_PREPROCESS_MODE;
+  const audioAdaptMode =
+    env.AUDIO_ADAPT_MODE === "auto"
+      ? env.OPENAI_API_KEY
+        ? "openai"
+        : "off"
+      : env.AUDIO_ADAPT_MODE;
 
   if (ttsMode === "openai" && !env.OPENAI_API_KEY) {
     throw new Error("OPENAI_API_KEY is required when TTS_MODE=openai");
@@ -57,6 +67,9 @@ export function loadConfig(): AppConfig {
     throw new Error(
       "OPENAI_API_KEY is required when CONTENT_PREPROCESS_MODE=openai",
     );
+  }
+  if (audioAdaptMode === "openai" && !env.OPENAI_API_KEY) {
+    throw new Error("OPENAI_API_KEY is required when AUDIO_ADAPT_MODE=openai");
   }
 
   return {
@@ -70,9 +83,11 @@ export function loadConfig(): AppConfig {
     openAiApiKey: env.OPENAI_API_KEY,
     openAiModel: env.OPENAI_MODEL,
     openAiPreprocessModel: env.OPENAI_PREPROCESS_MODEL,
+    openAiAdaptModel: env.OPENAI_ADAPT_MODEL,
     openAiVoice: env.OPENAI_VOICE,
     ttsMode,
     contentPreprocessMode,
+    audioAdaptMode,
     userAgent:
       "NovaAudios/0.1 (+https://example.local; article extraction and audiobook packaging)",
   };
