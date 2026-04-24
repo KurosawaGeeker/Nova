@@ -7,7 +7,6 @@ on:
 
 jobs:
   send-report:
-    if: ${{ secrets.DAILY_REPORT_OPENAI_API_KEY != '' && secrets.DAILY_REPORT_QQ_SMTP_USER != '' && secrets.DAILY_REPORT_QQ_SMTP_PASS != '' && secrets.DAILY_REPORT_RECIPIENTS != '' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -31,4 +30,9 @@ jobs:
           QQ_SMTP_USER: ${{ secrets.DAILY_REPORT_QQ_SMTP_USER }}
           QQ_SMTP_PASS: ${{ secrets.DAILY_REPORT_QQ_SMTP_PASS }}
           REPORT_RECIPIENTS: ${{ secrets.DAILY_REPORT_RECIPIENTS }}
-        run: npm run dev
+        run: |
+          test -n "$OPENAI_API_KEY"
+          test -n "$QQ_SMTP_USER"
+          test -n "$QQ_SMTP_PASS"
+          test -n "$REPORT_RECIPIENTS"
+          npm run dev
