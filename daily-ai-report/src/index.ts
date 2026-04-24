@@ -206,9 +206,27 @@ function cleanSummary(input: string): string {
     .trim();
 }
 
-function normalizeCategories(values: string[]): string[] {
+function normalizeCategories(values: unknown[]): string[] {
   return values
-    .map((value) => value.trim())
+    .map((value) => {
+      if (typeof value === "string") {
+        return value.trim();
+      }
+      if (value && typeof value === "object") {
+        const candidate = value as {
+          _?: unknown;
+          $?: { domain?: unknown };
+          name?: unknown;
+        };
+        if (typeof candidate._ === "string") {
+          return candidate._.trim();
+        }
+        if (typeof candidate.name === "string") {
+          return candidate.name.trim();
+        }
+      }
+      return "";
+    })
     .filter(Boolean)
     .filter((value, index, array) => array.indexOf(value) === index);
 }
