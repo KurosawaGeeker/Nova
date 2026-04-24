@@ -1,0 +1,34 @@
+name: Daily AI Report
+
+on:
+  schedule:
+    - cron: "0 1 * * *"
+  workflow_dispatch:
+
+jobs:
+  send-report:
+    if: ${{ secrets.DAILY_REPORT_OPENAI_API_KEY != '' && secrets.DAILY_REPORT_QQ_SMTP_USER != '' && secrets.DAILY_REPORT_QQ_SMTP_PASS != '' && secrets.DAILY_REPORT_RECIPIENTS != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: daily-ai-report/package-lock.json
+
+      - name: Install dependencies
+        working-directory: daily-ai-report
+        run: npm ci
+
+      - name: Generate and send report
+        working-directory: daily-ai-report
+        env:
+          OPENAI_API_KEY: ${{ secrets.DAILY_REPORT_OPENAI_API_KEY }}
+          QQ_SMTP_USER: ${{ secrets.DAILY_REPORT_QQ_SMTP_USER }}
+          QQ_SMTP_PASS: ${{ secrets.DAILY_REPORT_QQ_SMTP_PASS }}
+          REPORT_RECIPIENTS: ${{ secrets.DAILY_REPORT_RECIPIENTS }}
+        run: npm run dev

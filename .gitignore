@@ -8,3 +8,8 @@ android/**/build
 android/.idea
 
 .DS_Store
+
+# daily-ai-report
+daily-ai-report/node_modules
+daily-ai-report/dist
+daily-ai-report/.env
