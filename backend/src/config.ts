@@ -9,10 +9,16 @@ const schema = z.object({
   FETCH_TIMEOUT_MS: z.coerce.number().int().positive().default(30_000),
   MAX_JOB_AGE_HOURS: z.coerce.number().int().positive().default(24),
   IMPORT_CONCURRENCY: z.coerce.number().int().positive().max(8).default(3),
+  DISCOVERY_MAX_PAGES: z.coerce.number().int().positive().max(200).default(80),
+  DISCOVERY_MAX_CHAPTERS: z.coerce.number().int().positive().max(200).default(50),
+  DISCOVERY_MAX_DEPTH: z.coerce.number().int().nonnegative().max(5).default(2),
+  DISCOVERY_TIMEOUT_MS: z.coerce.number().int().positive().default(20_000),
   OPENAI_API_KEY: z.string().optional(),
   OPENAI_MODEL: z.string().default("gpt-4o-mini-tts"),
   OPENAI_PREPROCESS_MODEL: z.string().default("gpt-4o-mini"),
   OPENAI_ADAPT_MODEL: z.string().default("gpt-4o-mini"),
+  OPENAI_COMMAND_MODEL: z.string().default("gpt-4o-mini"),
+  OPENAI_STT_MODEL: z.string().default("gpt-4o-mini-transcribe"),
   OPENAI_VOICE: z.string().default("alloy"),
   TTS_MODE: z.enum(["auto", "openai", "mock"]).default("auto"),
   CONTENT_PREPROCESS_MODE: z.enum(["auto", "openai", "heuristic"]).default("auto"),
@@ -27,10 +33,16 @@ export interface AppConfig {
   fetchTimeoutMs: number;
   maxJobAgeHours: number;
   importConcurrency: number;
+  discoveryMaxPages?: number;
+  discoveryMaxChapters?: number;
+  discoveryMaxDepth?: number;
+  discoveryTimeoutMs?: number;
   openAiApiKey?: string;
   openAiModel: string;
   openAiPreprocessModel: string;
   openAiAdaptModel: string;
+  openAiCommandModel: string;
+  openAiSttModel: string;
   openAiVoice: string;
   ttsMode: "openai" | "mock";
   contentPreprocessMode: "openai" | "heuristic";
@@ -80,10 +92,16 @@ export function loadConfig(): AppConfig {
     fetchTimeoutMs: env.FETCH_TIMEOUT_MS,
     maxJobAgeHours: env.MAX_JOB_AGE_HOURS,
     importConcurrency: env.IMPORT_CONCURRENCY,
+    discoveryMaxPages: env.DISCOVERY_MAX_PAGES,
+    discoveryMaxChapters: env.DISCOVERY_MAX_CHAPTERS,
+    discoveryMaxDepth: env.DISCOVERY_MAX_DEPTH,
+    discoveryTimeoutMs: env.DISCOVERY_TIMEOUT_MS,
     openAiApiKey: env.OPENAI_API_KEY,
     openAiModel: env.OPENAI_MODEL,
     openAiPreprocessModel: env.OPENAI_PREPROCESS_MODEL,
     openAiAdaptModel: env.OPENAI_ADAPT_MODEL,
+    openAiCommandModel: env.OPENAI_COMMAND_MODEL,
+    openAiSttModel: env.OPENAI_STT_MODEL,
     openAiVoice: env.OPENAI_VOICE,
     ttsMode,
     contentPreprocessMode,

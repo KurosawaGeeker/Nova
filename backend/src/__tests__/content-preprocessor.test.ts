@@ -20,6 +20,8 @@ const baseConfig: AppConfig = {
   openAiModel: "gpt-4o-mini-tts",
   openAiPreprocessModel: "gpt-4o-mini",
   openAiAdaptModel: "gpt-4o-mini",
+  openAiCommandModel: "gpt-4o-mini",
+  openAiSttModel: "gpt-4o-mini-transcribe",
   openAiVoice: "alloy",
   ttsMode: "mock",
   contentPreprocessMode: "heuristic",
